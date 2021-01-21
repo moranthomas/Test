@@ -1,3 +1,5 @@
+package Reactive;
+
 import com.github.fridujo.rabbitmq.mock.MockChannel;
 import com.github.fridujo.rabbitmq.mock.MockConnection;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
@@ -14,6 +16,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -26,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.*;
+
 
 @Slf4j
 public class ReactiveRabbitTests {
@@ -145,7 +148,7 @@ public class ReactiveRabbitTests {
             }
 
             log.info("Processed {}/{} messages", countOfAcknowledged.get(), countOfGenerated.get());
-            assertEquals(countOfGenerated.get(), countOfAcknowledged.get());
+            assertThat(countOfGenerated.get()).isEqualTo(countOfAcknowledged.get());
         })
                 .onFailure(IOException.class, e -> log.warn("Unable to mock connection"))
                 .onFailure(TimeoutException.class, e -> log.warn("Unable to create channel"))
@@ -159,6 +162,11 @@ public class ReactiveRabbitTests {
         Envelope envelope;
         AMQP.BasicProperties properties;
         byte[] body;
+    }
+
+    class RabbitProcessor {
+        public void subscribe() {
+        }
     }
 
 }

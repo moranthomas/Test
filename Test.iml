@@ -49,9 +49,6 @@
     <orderEntry type="library" name="Maven: com.oath.cyclops:cyclops-futurestream:10.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.oath.cyclops:cyclops-reactive-collections:10.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.h2database:h2:1.4.200" level="project" />
-    <orderEntry type="library" name="Maven: com.esotericsoftware:kryo:5.0.3" level="project" />
-    <orderEntry type="library" name="Maven: com.esotericsoftware:reflectasm:1.11.9" level="project" />
-    <orderEntry type="library" name="Maven: org.objenesis:objenesis:3.1" level="project" />
     <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter:5.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
@@ -60,6 +57,7 @@
     <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.7.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.7.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.junit.platform:junit-platform-engine:1.7.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.18.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-all:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-ratelimiter:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-core:1.6.1" level="project" />
@@ -69,6 +67,5 @@
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-cache:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: javax.cache:cache-api:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-timelimiter:1.6.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.18.1" level="project" />
   </component>
 </module>
