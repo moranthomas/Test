@@ -1,8 +1,5 @@
 package Reactive;
 
-import com.github.fridujo.rabbitmq.mock.MockChannel;
-import com.github.fridujo.rabbitmq.mock.MockConnection;
-import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.oath.cyclops.async.QueueFactories;
 import com.oath.cyclops.async.adapters.Queue;
 import com.rabbitmq.client.*;
@@ -16,9 +13,6 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -43,29 +37,29 @@ public class ReactiveRabbitTests {
 
     @Test
     public void messageChunkingExample() {
-        String exchangeName = "test-exchange";
-        String routingKey = "test.key";
+
+        String exchangeName = "amq.direct";
+        String routingKey = "";
+
         String whoAmI =
                 Try.of(() -> InetAddress.getLocalHost().getHostName()).getOrElse(UUID.randomUUID().toString());
 
         ExecutorService executorService = Executors.newCachedThreadPool();
-        Scheduler scheduler = Schedulers.fromExecutor(executorService);
-
         CircuitBreaker globalBreaker = CircuitBreaker.ofDefaults("global");
 
         Try.run(() -> {
 
-            //Fake RabbitMQ implementation courtesy of frudujo
-            //https://github.com/fridujo/rabbitmq-mock
-            Connection conn = new MockConnectionFactory().newConnection();
-            assertThat(conn).isInstanceOf(MockConnection.class);
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost("localhost");
+            Connection connection;
+            Channel channel;
+            final String queueName = "spend-trend-rabbit-mq";
 
-            Channel channel = conn.createChannel();
-            assertThat(channel).isInstanceOf(MockChannel.class);
+            connection = factory.newConnection();
+            channel = connection.createChannel();
+            channel.queueDeclare(queueName, true, false, false, null);
+            log.info("Consume Test: RxJava Service Connection to Rabbit Queue successful *************************\n\n");
 
-            channel.exchangeDeclare(exchangeName, "direct", true);
-            String queueName = channel.queueDeclare().getQueue();
-            channel.queueBind(queueName, exchangeName, routingKey);
 
             //How big the test shall be
             AtomicInteger countOfGenerated = new AtomicInteger();

@@ -67,5 +67,8 @@
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-cache:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: javax.cache:cache-api:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: io.github.resilience4j:resilience4j-timelimiter:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:unknown" level="project" />
+    <orderEntry type="library" name="Maven: io.reactivex.rxjava3:rxjava:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.3" level="project" />
   </component>
 </module>
