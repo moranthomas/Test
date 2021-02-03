@@ -26,9 +26,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RxJavaRabbitMQTests {
+public class RxJavaRabbitExecutorTests {
 
-    private static final Logger log = LoggerFactory.getLogger(RxJavaRabbitMQTests.class);
+    private static final Logger log = LoggerFactory.getLogger(RxJavaRabbitExecutorTests.class);
 
     @Test
     public void messageChunkingExample() {

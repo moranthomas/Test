@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Slf4j
-public class RefactorTest {
+public class RefactorRabbitTest {
 
     @Test
     public Mono<ServerResponse> StartupLayer_publish(ServerRequest request) {

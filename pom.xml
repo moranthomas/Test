@@ -39,6 +39,12 @@
             <version>3.4.2</version>
         </dependency>
         <dependency>
+             <groupId>org.springframework.amqp</groupId>
+             <artifactId>spring-rabbit</artifactId>
+             <version>2.3.4</version>
+        x</dependency>
+
+        <dependency>
             <groupId>io.projectreactor.rabbitmq</groupId>
             <artifactId>reactor-rabbitmq</artifactId>
             <version>1.5.1</version>
@@ -47,11 +53,6 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit</artifactId>
-            <version>2.3.4</version>
         </dependency>
         <dependency>
             <groupId>com.oath.cyclops</groupId>
@@ -106,9 +107,14 @@
             <artifactId>reactor-test</artifactId>
             <version>3.4.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.0.3</version>
+        </dependency>
 
 
-        <!-- TEST TOOLS -->
+        <!-- RabbitMQ fakes and TEST tools -->
         <dependency>
             <groupId>com.github.fridujo</groupId>
             <artifactId>rabbitmq-mock</artifactId>
@@ -142,12 +148,6 @@
             <artifactId>mockito-core</artifactId>
             <version>2.23.4</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <artifactId>gfs-citi-voltage-encryptor</artifactId>
-            <groupId>com.firstdata.fs</groupId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

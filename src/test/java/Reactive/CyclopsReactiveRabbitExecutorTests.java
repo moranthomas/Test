@@ -27,10 +27,11 @@ import static org.assertj.core.api.Assertions.*;
 
 
 @Slf4j
-public class ReactiveRabbitTests {
+public class CyclopsReactiveRabbitExecutorTests {
 
     @Test
     public void rabbitProcessorMustBeAvailable() {
+        //Cyclops Rabbit Processor
         RabbitProcessor rabbitProcessor = new RabbitProcessor();
         rabbitProcessor.subscribe();
     }
