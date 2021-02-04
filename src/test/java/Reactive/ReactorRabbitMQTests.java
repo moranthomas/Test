@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -86,15 +87,19 @@ public class ReactorRabbitMQTests {
             AtomicBoolean latchCompleted = new AtomicBoolean(false);
 
             // Java.util.concurrent synchronization aid - allows one or more threads to wait until operations being performed in other threads completes
-           CountDownLatch latch = new CountDownLatch(messageCount);
+            Phaser phaser = new Phaser(messageCount);
+
+            //CountDownLatch latch = new CountDownLatch(messageCount);
 
             publishFakeMessages(exchangeName, routingKey, connectionMono, kryoPool, messageCount);
 
            //Wait 3 seconds for the process to complete - we are setting the value in the Atomic Boolean for thread safety
-            latchCompleted.set(latch.await(3, TimeUnit.SECONDS));
+            phaser.arriveAndAwaitAdvance();
+            //latchCompleted.set(latch.await(3, TimeUnit.SECONDS));
 
             //Test if we did wait 3 secs....
-            assertThat(latchCompleted.get()).isTrue();
+            //assertThat(latchCompleted.get()).isTrue();
+            assertThat(phaser.arrive()).isNotZero();
         })
             .onFailure(IOException.class, e -> log.warn("Unable to mock connection"))
             .onFailure(TimeoutException.class, e -> log.warn("Unable to create channel"))
