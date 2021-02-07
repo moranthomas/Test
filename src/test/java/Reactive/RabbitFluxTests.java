@@ -1,4 +1,4 @@
-package reactor.rabbitmq;
+package Reactive;
 
 import com.rabbitmq.client.*;
 import org.junit.jupiter.api.AfterEach;
@@ -14,7 +14,23 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.publisher.*;
 import reactor.core.scheduler.Schedulers;
+import reactor.rabbitmq.AcknowledgableDelivery;
 import reactor.rabbitmq.ChannelCloseHandlers.SenderChannelCloseHandler;
+import reactor.rabbitmq.ConsumeOptions;
+import reactor.rabbitmq.ExceptionHandlers;
+import reactor.rabbitmq.ExchangeSpecification;
+import reactor.rabbitmq.OutboundMessage;
+import reactor.rabbitmq.OutboundMessageResult;
+import reactor.rabbitmq.QueueSpecification;
+import reactor.rabbitmq.RabbitFlux;
+import reactor.rabbitmq.RabbitFluxException;
+import reactor.rabbitmq.Receiver;
+import reactor.rabbitmq.ReceiverOptions;
+import reactor.rabbitmq.ResourceManagementOptions;
+import reactor.rabbitmq.SendOptions;
+import reactor.rabbitmq.Sender;
+import reactor.rabbitmq.SenderOptions;
+import reactor.rabbitmq.Utils;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
@@ -152,7 +168,8 @@ public class RabbitFluxTests {
     @Test
     public void acknowledgableDeliveryAckNackIsIdempotent() throws Exception {
         Channel channel = mock(Channel.class);
-        BiConsumer<Receiver.AcknowledgmentContext, Exception> exceptionHandler = mock(ExceptionHandlers.RetryAcknowledgmentExceptionHandler.class);
+        BiConsumer<Receiver.AcknowledgmentContext, Exception> exceptionHandler = mock(
+            ExceptionHandlers.RetryAcknowledgmentExceptionHandler.class);
         doNothing().doThrow(new IOException()).when(channel).basicAck(anyLong(), anyBoolean());
         doThrow(new IOException()).when(channel).basicNack(anyLong(), anyBoolean(), anyBoolean());
         AcknowledgableDelivery msg = new AcknowledgableDelivery(
@@ -920,7 +937,7 @@ public class RabbitFluxTests {
         }
     }
 
-    @Test
+    /*@Test
     public void declareDeleteResourcesWithOptions() throws Exception {
         Channel channel = connection.createChannel();
 
@@ -986,7 +1003,7 @@ public class RabbitFluxTests {
                 // OK
             }
         }
-    }
+    }*/
 
     @Test
     public void createResourcesPublishConsume() throws Exception {
@@ -1151,7 +1168,8 @@ public class RabbitFluxTests {
         sender = createSender(new SenderOptions().connectionMono(connectionMono));
         receiver = createReceiver(new ReceiverOptions().connectionMono(connectionMono));
 
-        String connectionQueue = sender.declare(QueueSpecification.queue().durable(false).autoDelete(true).exclusive(true))
+        String connectionQueue = sender.declare(
+            QueueSpecification.queue().durable(false).autoDelete(true).exclusive(true))
             .block().getQueue();
 
         sendAndReceiveMessages(connectionQueue);
@@ -1245,7 +1263,8 @@ public class RabbitFluxTests {
         sender = createSender(new SenderOptions()
             .connectionMono(Mono.fromCallable(() -> connectionFactory.newConnection("non-existing-passive-exchange"))));
 
-        StepVerifier.create(sender.declareExchange(ExchangeSpecification.exchange("non-existing-exchange").passive(true))).expectError(ShutdownSignalException.class).verify();
+        StepVerifier.create(sender.declareExchange(
+            ExchangeSpecification.exchange("non-existing-exchange").passive(true))).expectError(ShutdownSignalException.class).verify();
     }
 
     @Test
