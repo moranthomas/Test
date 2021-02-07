@@ -1,5 +1,6 @@
 package Reactive;
 
+import com.rabbitmq.client.Address;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -14,12 +15,14 @@ import org.junit.Test;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.rabbitmq.OutboundMessage;
 import reactor.rabbitmq.OutboundMessageResult;
 import reactor.rabbitmq.QueueSpecification;
 import reactor.rabbitmq.RabbitFlux;
 import reactor.rabbitmq.Receiver;
 import reactor.rabbitmq.Sender;
+import reactor.rabbitmq.SenderOptions;
 
 @Slf4j
 public class SimpleReactorRabbitTests {
@@ -33,53 +36,14 @@ public class SimpleReactorRabbitTests {
     private final Receiver receiver = RabbitFlux.createReceiver();
     private final Sender sender = RabbitFlux.createSender();
 
-    @Test
-    public void testSender() throws InterruptedException {
+    SenderOptions senderOptions =  new SenderOptions()
+        .connectionFactory(factory)
+        .connectionSupplier(cf -> cf.newConnection(
+            new Address[] {new Address("192.168.0.1"), new Address("192.168.0.2")},
+            "reactive-sender"))
+        .resourceManagementScheduler(Schedulers.boundedElastic());
 
-        Try.run(() -> {
-            Mono<Connection> connectionMono = Mono.fromCallable(() -> {
-
-                /*** Use com.github.fridujo.rabbitmq.mock for Tests **/
-                //Connection FakeRabbitConnection = new MockConnectionFactory().newConnection();
-                Connection connection = factory.newConnection();
-                Channel channel = connection.createChannel();
-
-                // Create an exchange - rabbitMQ will just ignore the request if there is already one declared.
-                channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT, true);
-                log.info("Declared Exchange: " + exchangeName);
-
-                // Create a queue - The declaration will have no effect if the queue does already exist.
-                //channel.queueDeclare(queueName, true, false, false, null);
-                log.info("Declared Queue: " + queueName);
-
-                // Bindings are nothing but routing between Exchanges and Queues. Messages are never published directly to a Queue.
-                channel.queueBind(queueName, exchangeName, routingKey);
-                log.info("Producer Test: Connection to Rabbit Queue successful *************************\n\n");
-                return connection;
-            })
-                .cache();
-        })
-            .onFailure(IOException.class, e -> log.warn("Unable to mock connection"))
-            .onFailure(TimeoutException.class, e -> log.warn("Unable to create channel"))
-            .onFailure(InterruptedException.class, e -> log.warn("Timed out waiting for messages"));
-        //.onFailure(fail("Publisher:: Assertions Failed"));
-
-        int count = 20;
-        CountDownLatch latch = new CountDownLatch(count);
-        SampleSender sender = new SampleSender();
-        factory.setHost("localhost");
-        messageCount = 5000;
-
-        sender.send(queueName, count, latch);
-        //Disposable disposable = receiver.consume(queueName, latch);
-
-        latch.await(3, TimeUnit.SECONDS);
-        this.sender.close();
-    }
-
-    @Test
-    public void testReceiver() throws InterruptedException {
-
+    private void setUpRabbitConnection() {
         Try.run(() -> {
             Mono<Connection> connectionMono = Mono.fromCallable(() -> {
 
@@ -107,21 +71,43 @@ public class SimpleReactorRabbitTests {
             .onFailure(TimeoutException.class, e -> log.warn("Unable to create channel"))
             .onFailure(InterruptedException.class, e -> log.warn("Timed out waiting for messages"));
         //.onFailure(fail("Publisher:: Assertions Failed"));
+    }
+
+    @Test
+    public void testSender() throws InterruptedException {
+
+        setUpRabbitConnection();
 
         int count = 20;
         CountDownLatch latch = new CountDownLatch(count);
-
-
-
-        SampleReceiver receiver = new SampleReceiver();
+        SampleSender sender = new SampleSender();
         factory.setHost("localhost");
         messageCount = 5000;
+
+        sender.send(queueName, count, latch);
+        //Disposable disposable = receiver.consume(queueName, latch);
+
+        latch.await(3, TimeUnit.SECONDS);
+        this.sender.close();
+    }
+
+    @Test
+    public void testReceiver() throws InterruptedException {
+
+        setUpRabbitConnection();
+        int count = 20;
+        factory.setHost("localhost");
+        messageCount = 5000;
+
+        CountDownLatch latch = new CountDownLatch(count);
+        SampleReceiver receiver = new SampleReceiver();
+
         Disposable disposable = receiver.consume(queueName, latch);
+
         latch.await(3, TimeUnit.SECONDS);
         disposable.dispose();
         this.receiver.close();
     }
-
 
 
     class SampleSender {
