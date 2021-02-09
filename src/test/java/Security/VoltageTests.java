@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class VoltageTests {
 
-    @Test
+    /*@Test
     public VirtualFile getReceipt(int transactionId, DCalContext context)throws RemoteException, SQLException,
             DCalMissingContextException, Exception, MaxFileSizeException{
         VirtualFile file = null;
@@ -49,6 +49,6 @@ public class VoltageTests {
         }
 
         return file;
-    }
+    }*/
 
 }
