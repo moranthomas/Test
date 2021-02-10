@@ -128,7 +128,9 @@ public class ReactorRabbitSimpleTests {
             }
         };
 
-        sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        //sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        //sender.sendFluxMessages(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        sender.sendRpcClientNonKryo(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
 
         latch.await(3, TimeUnit.SECONDS);
         this.sender.close();
@@ -172,7 +174,7 @@ public class ReactorRabbitSimpleTests {
 
         }
 
-        public void sendRpcClientNonKryo(String exchangeName, String jsonMessage, Sender sender, String routingKey, CountDownLatch latch) {
+        public void sendRpcClientNonKryo(String exchangeName, String jsonMessage, Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
 
             RpcClient rpcClient = sender.rpcClient(exchangeName, routingKey);
             PubSubMessage message = new PubSubMessage(routingKey.substring(12, routingKey.lastIndexOf('-')), UUID
@@ -183,6 +185,23 @@ public class ReactorRabbitSimpleTests {
                 .subscribe();
             latch.countDown();
             rpcClient.close();
+        }
+
+        public void sendFluxMessages(String exchangeName, String jsonMessage, Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
+
+            sender.send(Flux.range(1, messageCount)
+                .map(s -> {
+                    PubSubMessage message = new PubSubMessage(routingKey.substring(12, routingKey.lastIndexOf('-')), UUID.randomUUID().toString(), jsonMessage);
+                    Output output = new Output(1024, -1);
+                    Kryo kryo = kryoPool.obtain();
+                    kryo.writeObject(output, message);
+                    kryoPool.free(kryo);
+
+                    return new OutboundMessage(exchangeName, routingKey, output.getBuffer());
+                }))
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+            latch.countDown();
         }
     }
 
