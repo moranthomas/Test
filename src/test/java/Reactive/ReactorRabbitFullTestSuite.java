@@ -68,7 +68,7 @@ import static reactor.rabbitmq.ResourcesSpecification.*;
 /**
  *
  */
-public class RabbitFluxTests {
+public class ReactorRabbitFullTestSuite {
 
     // TODO refactor test with StepVerifier
 

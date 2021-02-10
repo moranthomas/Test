@@ -25,7 +25,7 @@ import reactor.rabbitmq.Sender;
 import reactor.rabbitmq.SenderOptions;
 
 @Slf4j
-public class SimpleReactorRabbitTests {
+public class ReactorRabbitSimpleTests {
 
     String exchangeName = "amq.direct";
     String routingKey = "";

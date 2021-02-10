@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 
 @Slf4j
-public class ReactorRabbitMQTests {
+public class ReactorRabbitGatewayProducerTests {
 
 
     @Test
