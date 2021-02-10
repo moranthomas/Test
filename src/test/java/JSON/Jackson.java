@@ -3,7 +3,12 @@ package JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.ResourceUtils;
 
 
 public  class Jackson {
@@ -85,5 +90,34 @@ public  class Jackson {
                 }
             }
         }
+
+    private String getJSONFromFileApacheCommonsIO() {
+
+        String jsonMessage = null;
+        try {
+            File file = ResourceUtils.getFile("classpath:sample_token.json");
+            jsonMessage = FileUtils.readFileToString(file, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonMessage;
+    }
+
+
+        /*
+        REQUIRES JAVA 11 - LEAVING HERE FOR REFERENCE
+        private String getJSONFromFileJava11() {
+        String jsonContent =n ull;
+            try {
+                Path jsonFile = Paths.get("src/test/resources/sample_token.json");
+                String jsonContent = Files.readString(jsonFile);
+                return jsonContent;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }*/
 }
 
