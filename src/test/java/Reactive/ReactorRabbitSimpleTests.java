@@ -34,12 +34,16 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.rabbitmq.ChannelPool;
+import reactor.rabbitmq.ChannelPoolFactory;
+import reactor.rabbitmq.ChannelPoolOptions;
 import reactor.rabbitmq.OutboundMessage;
 import reactor.rabbitmq.OutboundMessageResult;
 import reactor.rabbitmq.QueueSpecification;
 import reactor.rabbitmq.RabbitFlux;
 import reactor.rabbitmq.Receiver;
 import reactor.rabbitmq.RpcClient;
+import reactor.rabbitmq.SendOptions;
 import reactor.rabbitmq.Sender;
 import reactor.rabbitmq.SenderOptions;
 
@@ -105,13 +109,13 @@ public class ReactorRabbitSimpleTests {
     @Test
     public void testRpcClientSpeed() throws InterruptedException, IOException {
 
-        setUpRabbitConnection();
+        Mono<Connection> connectionMono = setUpRabbitConnection();
 
-        int count = 5000;
-        CountDownLatch latch = new CountDownLatch(count);
+        messageCount = 5000;
+        CountDownLatch latch = new CountDownLatch(messageCount);
         SampleSender sender = new SampleSender();
         factory.setHost("localhost");
-        messageCount = 5000;
+
 
         ObjectMapper mapper = new ObjectMapper();
         String tokenFileName = "sample_token.json";
@@ -128,9 +132,10 @@ public class ReactorRabbitSimpleTests {
             }
         };
 
-        sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        //sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
         //sender.sendFluxMessages(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
         //sender.sendRpcClientNonKryo(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        sender.sendFluxMessagesWithChannelPooling(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch, connectionMono);
 
         latch.await(3, TimeUnit.SECONDS);
         this.sender.close();
@@ -207,11 +212,38 @@ public class ReactorRabbitSimpleTests {
             latch.countDown();
         }
 
+        public void sendFluxMessagesWithChannelPooling(String exchangeName, String jsonMessage,
+            Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch,
+            Mono<Connection> connectionMono) {
+
+            ChannelPool channelPool = ChannelPoolFactory.createChannelPool(
+                connectionMono,
+                new ChannelPoolOptions().maxCacheSize(5)
+            );
+
+            sender.send(Flux.range(1, messageCount)
+                .map(s -> {
+                    PubSubMessage message = new PubSubMessage(routingKey.substring(12, routingKey.lastIndexOf('-')), UUID.randomUUID().toString(), jsonMessage);
+                    Output output = new Output(1024, -1);
+                    Kryo kryo = kryoPool.obtain();
+                    kryo.writeObject(output, message);
+                    kryoPool.free(kryo);
+
+                    return new OutboundMessage(exchangeName, routingKey, output.getBuffer());
+                }), new SendOptions().channelPool(channelPool))
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+            latch.countDown();
+            channelPool.close();
+        }
+
+
     }
 
-    private void setUpRabbitConnection() {
-        Try.run(() -> {
-            Mono<Connection> connectionMono = Mono.fromCallable(() -> {
+    private Mono<Connection> setUpRabbitConnection() {
+        Mono<Connection> connectionMono = null;
+        try {
+            connectionMono = Mono.fromCallable(() -> {
 
                 /*** Use com.github.fridujo.rabbitmq.mock for Tests **/
                 //Connection FakeRabbitConnection = new MockConnectionFactory().newConnection();
@@ -230,15 +262,16 @@ public class ReactorRabbitSimpleTests {
                 channel.queueBind(queueName, exchangeName, tokenRoutingKey);
                 channel.queueBind(queueName, exchangeName, transactionRoutingKey);
 
-                log.info("Producer Test: Connection to Rabbit Queue successful *************************\n\n");
+                log.info(
+                    "Producer Test: Connection to Rabbit Queue successful *************************\n\n");
                 return connection;
             })
                 .cache();
-        })
-            .onFailure(IOException.class, e -> log.warn("Unable to mock connection"))
-            .onFailure(TimeoutException.class, e -> log.warn("Unable to create channel"))
-            .onFailure(InterruptedException.class, e -> log.warn("Timed out waiting for messages"));
-        //.onFailure(fail("Publisher:: Assertions Failed"));
+        }
+         catch(Exception exception) {
+                log.error("Failed to establish RabbitMQ exchange and queues", exception);
+            }
+            return connectionMono;
     }
 
     class SampleReceiver {
