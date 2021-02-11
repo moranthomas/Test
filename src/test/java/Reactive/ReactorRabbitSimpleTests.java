@@ -107,7 +107,7 @@ public class ReactorRabbitSimpleTests {
 
         setUpRabbitConnection();
 
-        int count = 20;
+        int count = 5000;
         CountDownLatch latch = new CountDownLatch(count);
         SampleSender sender = new SampleSender();
         factory.setHost("localhost");
@@ -128,9 +128,9 @@ public class ReactorRabbitSimpleTests {
             }
         };
 
-        //sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        sender.sendRpcClient(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
         //sender.sendFluxMessages(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
-        sender.sendRpcClientNonKryo(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
+        //sender.sendRpcClientNonKryo(exchangeName, jsonMessage, kryoPool, new Sender() , tokenRoutingKey, latch);
 
         latch.await(3, TimeUnit.SECONDS);
         this.sender.close();
@@ -169,12 +169,14 @@ public class ReactorRabbitSimpleTests {
             rpcClient.rpc(Mono.just(new RpcClient.RpcRequest(output.getBuffer())))
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
+            latch.countDown();
             rpcClient.close();
 
 
         }
 
-        public void sendRpcClientNonKryo(String exchangeName, String jsonMessage, Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
+        public void sendRpcClientNonKryo(String exchangeName, String jsonMessage,
+            Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
 
             RpcClient rpcClient = sender.rpcClient(exchangeName, routingKey);
             PubSubMessage message = new PubSubMessage(routingKey.substring(12, routingKey.lastIndexOf('-')), UUID
@@ -187,7 +189,8 @@ public class ReactorRabbitSimpleTests {
             rpcClient.close();
         }
 
-        public void sendFluxMessages(String exchangeName, String jsonMessage, Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
+        public void sendFluxMessages(String exchangeName, String jsonMessage,
+            Pool<Kryo> kryoPool, Sender sender, String routingKey, CountDownLatch latch) {
 
             sender.send(Flux.range(1, messageCount)
                 .map(s -> {
@@ -203,6 +206,7 @@ public class ReactorRabbitSimpleTests {
                 .subscribe();
             latch.countDown();
         }
+
     }
 
     private void setUpRabbitConnection() {

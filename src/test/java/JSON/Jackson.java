@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ResourceUtils;
@@ -106,18 +108,24 @@ public  class Jackson {
     }
 
 
-        /*
-        REQUIRES JAVA 11 - LEAVING HERE FOR REFERENCE
-        private String getJSONFromFileJava11() {
-        String jsonContent =n ull;
-            try {
-                Path jsonFile = Paths.get("src/test/resources/sample_token.json");
-                String jsonContent = Files.readString(jsonFile);
-                return jsonContent;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }*/
+    /*
+    REQUIRES JAVA 11 - LEAVING HERE FOR REFERENCE
+    private String getJSONFromFileJava11() {
+    String jsonContent =n ull;
+        try {
+            Path jsonFile = Paths.get("src/test/resources/sample_token.json");
+            String jsonContent = Files.readString(jsonFile);
+            return jsonContent;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }*/
+
+    private String getJsonContentJava8(String name) throws IOException {
+        File file =
+            new File(Objects.requireNonNull(getClass().getClassLoader().getResource(name)).getFile());
+        return String.join("", Files.readAllLines(file.toPath()));
+    }
 }
 
