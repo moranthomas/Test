@@ -1,5 +1,7 @@
-package Guice;
+package Guice.impl;
 
+import Guice.CommunicationMode;
+import Guice.Communicator;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;

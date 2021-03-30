@@ -1,5 +1,7 @@
 
-package Guice;
+package Guice.impl;
+
+import Guice.CommunicationMode;
 
 public class EmailCommunicationMode implements CommunicationMode {
 

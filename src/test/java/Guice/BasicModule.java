@@ -1,5 +1,6 @@
 package Guice;
 
+import Guice.impl.EmailCommunicationMode;
 import com.google.inject.AbstractModule;
 import lombok.extern.slf4j.Slf4j;
 

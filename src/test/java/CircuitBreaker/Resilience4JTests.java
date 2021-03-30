@@ -58,13 +58,18 @@ public class Resilience4JTests {
 
         TimeLimiter timeLimiterWithCustomConfig = timeLimiterRegistry.timeLimiter("rabbitTimeLimiter", config);
 
-
         // Given I have a helloWorldService.sayHelloWorld() method which doesn't take too long (no artificial wait)
         HelloWorldService helloWorldService = new HelloWorldService() {
             @Override
             public String sayHelloWorld(String s) {
-                String str = "Hello Worlds!!!";
-                return str;
+                try{
+                    //Introduce an artificial wait - but keep it below the 1 second threshold
+                    Thread.sleep(20);
+                }
+                catch (InterruptedException ie) {
+                    log.error(String.valueOf(ie));
+                }
+                return s;
             }
         };
 
@@ -75,24 +80,18 @@ public class Resilience4JTests {
         CompletableFuture<String> result = timeLimiterWithCustomConfig.executeCompletionStage(
             scheduler, () -> CompletableFuture.supplyAsync(helloWorldService::sayHelloWorld)).toCompletableFuture();*/
 
-        String result = timeLimiterWithCustomConfig.executeFutureSupplier(() -> CompletableFuture.supplyAsync(() -> helloWorldService.sayHelloWorld("B")));
+        String result = timeLimiterWithCustomConfig.executeFutureSupplier(
+            () -> CompletableFuture.supplyAsync(() -> helloWorldService.sayHelloWorld("Hello World!")));
 
-        try{
-            //Wait for it to complete normally
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException ie) {
-            log.error(String.valueOf(ie));
-        }
         log.info(String.valueOf(result));
 
-        assertThat(String.valueOf(result).contains("Completed normally")).isTrue();
+        assertThat(String.valueOf(result).contains("Hello World!")).isTrue();
 
     }
 
 
     @SuppressWarnings("unchecked")
-    @Test
+    @Test(expected = TimeoutException.class)
     public void whenTimeLimitIsOver_thenItFailsAsExpected() throws Exception {
 
         // Create a basic TimeLimiter
@@ -111,30 +110,35 @@ public class Resilience4JTests {
         TimeLimiter timeLimiterWithCustomConfig = timeLimiterRegistry.timeLimiter("rabbitTimeLimiter", config);
 
         // Given I have a helloWorldService.sayHelloWorld() method which takes too long (artificial wait added)
-        /*HelloWorldService helloWorldService = new HelloWorldService() {
+        HelloWorldService helloWorldService = new HelloWorldService() {
             @Override
-            public String sayHelloWorld() {
-                try {
-                    Thread.sleep(600);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+            public String sayHelloWorld(String s) {
+                try{
+                    //Introduce an artificial wait - above the 1 second threshold
+                    Thread.sleep(1000);
                 }
-                String str = "Hello Worlds!!!";
-                return str;
+                catch (InterruptedException ie) {
+                    log.error(String.valueOf(ie));
+                }
+                return s;
             }
         };
 
-
-        // The Scheduler is needed to schedule a timeout on a non-blocking CompletableFuture
+        /*// The Scheduler is needed to schedule a timeout on a non-blocking CompletableFuture
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 
         // The non-blocking variant with a CompletableFuture
         CompletableFuture<String> result = timeLimiterWithCustomConfig.executeCompletionStage(
-            scheduler, () -> CompletableFuture.supplyAsync(helloWorldService::sayHelloWorld)).toCompletableFuture();
+            scheduler, () -> CompletableFuture.supplyAsync(helloWorldService::sayHelloWorld)).toCompletableFuture();*/
+
+
+        String result = timeLimiterWithCustomConfig.executeFutureSupplier(
+            () -> CompletableFuture.supplyAsync(() -> helloWorldService.sayHelloWorld("Hello World!")));
 
         log.info(String.valueOf(result));
 
-        assertThat(String.valueOf(result).contains("Not completed")).isTrue();*/
+        //assertThat(String.valueOf(result).contains("Hello World!")).isTrue();
+
 
     }
 
@@ -142,6 +146,7 @@ public class Resilience4JTests {
     @Test
     public void whenCircuitBreakerIsUsed_thenItWorksAsExpected() throws InterruptedException {
 
+        // STUB
         /*RemoteService service = new RemoteService() {
             @Override
             public int process(int i)  {
@@ -149,6 +154,7 @@ public class Resilience4JTests {
             }
         };*/
 
+        // MOCK
         service = mock(RemoteService.class);
         CircuitBreakerConfig config = CircuitBreakerConfig.custom()
             // Percentage of failures to start short-circuit
@@ -177,39 +183,8 @@ public class Resilience4JTests {
     }
 
 
-    private Future<?> callAndBlock(Function<Integer, Integer> decoratedService) throws InterruptedException {
-
-        /*RemoteService service = new RemoteService() {
-            @Override
-            public int process(int i)  {
-                return 0;
-            }
-        };*/
-        service = mock(RemoteService.class);
-
-        CountDownLatch latch = new CountDownLatch(1);
-        when(service.process(anyInt())).thenAnswer(invocation -> {
-            latch.countDown();
-            Thread.currentThread().join();
-            return null;
-        });
-
-        ForkJoinTask<?> result = ForkJoinPool.commonPool().submit(() -> {
-            decoratedService.apply(1);
-        });
-        latch.await();
-        return result;
-    }
-
     @Test
     public void whenRetryIsUsed_thenItWorksAsExpected() {
-
-        /*RemoteService service = new RemoteService() {
-            @Override
-            public int process(int i)  {
-                return 0;
-            }
-        };*/
 
         service = mock(RemoteService.class);
 
@@ -231,5 +206,25 @@ public class Resilience4JTests {
         }
     }
 
+
+
+
+    private Future<?> callAndBlock(Function<Integer, Integer> decoratedService) throws InterruptedException {
+
+        service = mock(RemoteService.class);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        when(service.process(anyInt())).thenAnswer(invocation -> {
+            latch.countDown();
+            Thread.currentThread().join();
+            return null;
+        });
+
+        ForkJoinTask<?> result = ForkJoinPool.commonPool().submit(() -> {
+            decoratedService.apply(1);
+        });
+        latch.await();
+        return result;
+    }
 
 }
