@@ -40,7 +40,6 @@ public class Resilience4JTests {
     private HelloWorldService helloWorldService;
 
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenTimeLimitIsUnder_thenItWorksAsExpected() throws Exception {
 
