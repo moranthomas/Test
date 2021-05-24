@@ -57,24 +57,35 @@ public class LoopsAndIterators {
         // Create a new list of Integers and initialize
         List<Integer> list = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5));
 
+        // Print out the list of all the numbers squared
+        System.out.println("The list of numbers squared: ");
+        list.stream().map(x -> x * x)
+                .forEach(System.out::println);
+
+
         // Create an array from this List (Optional Step)
         int[] intArray = new int[list.size()];
         for(int i = 0; i < list.size(); i++) {
             intArray[i] = list.get(i);
         }
+        // You can then call all the same operators on the stream as if you went straight to list
 
         // Two ways of creating an IntStream from this array:
-        
+
         // 1. Arrays.stream -> IntStream
+        System.out.println("\n The list of numbers that are exactly divisible by two: ");
         IntStream intStream1 = Arrays.stream(intArray);
-        intStream1.forEach(x -> System.out.println(x));
+        intStream1.filter(x-> x%2==0)
+        .forEach(System.out::println);
 
         // 2. Stream.of -> Stream<int[]>
-        Stream<int[]> temp = Stream.of(intArray);
+//        Stream<int[]> temp = Stream.of(intArray);
+//
+//        // Cant print Stream<int[]> directly, convert / flat it to IntStream
+//        IntStream intStream2 = temp.flatMapToInt(x -> Arrays.stream(x));
+//        intStream2.forEach(x -> System.out.println(x));
 
-        // Cant print Stream<int[]> directly, convert / flat it to IntStream
-        IntStream intStream2 = temp.flatMapToInt(x -> Arrays.stream(x));
-        intStream2.forEach(x -> System.out.println(x));
+
 
     }
 
