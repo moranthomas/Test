@@ -12,6 +12,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class LoopsAndIterators {
 
+    // Create a new list of Integers and initialize
+    List<Integer> intList = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5));
+
     @Test
     public void printAllAvailableZoneIds() {
 
@@ -51,6 +54,44 @@ public class LoopsAndIterators {
         assertThat(arraylist.contains("Dravid")).isTrue();
     }
 
+//    @Test
+//    public void testIntstreamToHashMap() {
+//        Map<Integer, Integer> myMap = new HashMap<>();
+//        myMap = intList.stream()
+//                    .filter(x -> x%2 == 0)
+//                    .collect(Collectors.toMap(x -> x[0], x -> ))
+//    }
+
+
+    @Test
+    public void testPairedSocksInList() {
+
+        List<Integer> intList = new ArrayList<Integer>(Arrays.asList(10, 20, 20, 10, 10, 30, 50, 10, 20));
+
+        // Loop through the list and compare each element with all the others and count, then modulo 2
+
+        Set<Integer> set = new HashSet<Integer>();
+        int pairCount = 0;
+
+        for(int i=0; i<intList.size(); i++) {
+            int element = intList.get(i);
+            if(set.contains(element)) {
+                set.remove(element);
+                pairCount++;
+            }
+            else {
+                set.add(element);
+            }
+        }
+        System.out.println("The number of pairs in the list is : " + pairCount);
+
+//        System.out.println("The number of pairs in the list is : " +
+//        intList.stream()
+//            .filter(x-> x%2==0)
+//            .count());
+    }
+
+
     @Test
     public void testIntStream() {
 
@@ -61,7 +102,6 @@ public class LoopsAndIterators {
         System.out.println("The list of numbers squared: ");
         list.stream().map(x -> x * x)
                 .forEach(System.out::println);
-
 
         // Create an array from this List (Optional Step)
         int[] intArray = new int[list.size()];
@@ -79,18 +119,15 @@ public class LoopsAndIterators {
         .forEach(System.out::println);
 
         // 2. Stream.of -> Stream<int[]>
-//        Stream<int[]> temp = Stream.of(intArray);
-//
-//        // Cant print Stream<int[]> directly, convert / flat it to IntStream
-//        IntStream intStream2 = temp.flatMapToInt(x -> Arrays.stream(x));
-//        intStream2.forEach(x -> System.out.println(x));
-
-
-
+        //  Stream<int[]> temp = Stream.of(intArray);
+        //
+        //  // Cant print Stream<int[]> directly, convert / flat it to IntStream
+        //  IntStream intStream2 = temp.flatMapToInt(x -> Arrays.stream(x));
+        //  intStream2.forEach(x -> System.out.println(x));
     }
 
     @Test
-    public void testStringStream() {
+    public void testStringStreamFromArray() {
 
         String[] array = {"a", "b", "c", "d", "e"};
 
@@ -102,6 +139,33 @@ public class LoopsAndIterators {
         Stream<String> stream2 = Stream.of(array);
         stream2.forEach(x -> System.out.println(x));
 
+    }
+
+    @Test
+    public void testCountingValleys() {
+
+        String path = "DDUUUUDD";
+        int steps = 8;
+
+        int valleyCount = 0;
+        Stack<Integer> stack = new Stack<>();
+
+        // start means you have had at least one valley
+        boolean start = false;
+        for(int i=0; i < path.length(); i++) {
+            if(path.charAt(i)=='D') {
+                start = true;
+                stack.push(1);
+            }
+            else if(start && path.charAt(i) == 'U') {
+                stack.pop();
+                if(stack.size() == 0) {
+                    valleyCount++;
+                    start = false;
+                }
+            }
+        }
+        System.out.println(valleyCount);
     }
 
 }
