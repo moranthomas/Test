@@ -2,9 +2,8 @@ package Strings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Scanner;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
+
 import org.junit.Test;
 import java.io.*;
 import java.util.regex.Pattern;
@@ -58,12 +57,12 @@ public class Strings {
         String str = "welcometojava";
         int k = 3;
 
-        solution1(str, k);      // Using Sorted Treeset
-        solution2(str, k);      // Using inline variables
+        solution1UsingSortedTreeSet(str, k);      // Using Sorted Treeset
+        solution2UsingInlineVariables(str, k);      // Using inline variables
 
     }
 
-    void solution1(String str, int k) {
+    void solution1UsingSortedTreeSet(String str, int k) {
         SortedSet<String> sets=new TreeSet<String>();
         for(int i=0; i<=str.length()-k; i++){
             sets.add(str.substring(i, i+k));
@@ -72,7 +71,7 @@ public class Strings {
         System.out.println(sets.last());
     }
 
-    void solution2(String str, int k) {
+    void solution2UsingInlineVariables(String str, int k) {
         String max=str.substring(0,k);
         String min=str.substring(0,k);
 
@@ -88,4 +87,50 @@ public class Strings {
         System.out.println(max);
     }
 
+
+    @Test
+    public String compareTwoStringsBrute(String s1, String s2) {
+        // Given two strings, determine if they share a common substring. A substring may be as small as one character.
+        String commonSubstring = "NO";
+
+        if(s1.contains(s2)) {
+            commonSubstring = "YES";
+        }
+
+        int s1Len = s1.length();
+        int s2Len = s2.length();
+
+        int shortestStringLength = s1Len > s2Len ? s2Len : s1Len;
+
+        // Loop through each character in s1 and see if
+        for(int i =0; i < shortestStringLength; i++) {
+            if(s1.contains(s2.substring(i, i+1)) ) {
+                commonSubstring = "YES";
+            }
+        }
+
+        return commonSubstring;
+    }
+
+    @Test
+    public String compareTwoStringsEfficient(String s1, String s2) {
+        // Given two strings, determine if they share a common substring. A substring may be as small as one character.
+        String commonSubstring = "NO";
+
+        Set<Character> s1Set = new HashSet<Character>();
+        Set<Character> s2Set = new HashSet<Character>();
+
+        for(char c : s1.toCharArray()) { s1Set.add(c); }
+        for(char c : s2.toCharArray()) { s2Set.add(c); }
+
+        // store intersection of both in s1Set
+        s1Set.retainAll(s2Set);
+
+        if(!s1Set.isEmpty()) {
+            commonSubstring = "YES";
+        }
+
+        return commonSubstring;
+
+    }
 }

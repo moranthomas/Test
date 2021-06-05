@@ -1,4 +1,4 @@
-package LoopsAndIterators;
+package LoopsArraysAndIterators;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -6,11 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Slf4j
-public class LoopsAndIterators {
+public class LoopsArraysAndIterators {
 
     // Create a new list of Integers and initialize
     List<Integer> intList = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5));
@@ -167,5 +168,82 @@ public class LoopsAndIterators {
         }
         System.out.println(valleyCount);
     }
+
+    @Test
+    public void testLeftRotationOfArrayUsingQueues() {
+
+        List<Integer> a = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5));
+        int d = 4;      //number of left rotations (shifts) to perform
+        // e.g. [1,2,3,4,5] -> [2,3,4,5,1] -> [3,4,5,2,1] -> [4,5,1,2,3] -> [5,1,2,3,4]
+        Queue<Integer> queue = new ConcurrentLinkedQueue<>();
+
+        Iterator iterator = a.iterator();
+        while(iterator.hasNext()) {
+            queue.add((Integer) iterator.next());
+        }
+        System.out.println("Initial Queue: " + queue);
+
+        for(int i = 0; i < d; i++) {
+             int top = queue.remove();
+             queue.add(top);
+             System.out.println(queue);
+        }
+
+        System.out.println("Final Queue: " + queue);
+        List l = new ArrayList(queue);
+
+    }
+
+    @Test
+    public void simpleArraySum() {
+
+        List<Integer> a = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5));
+
+        int sum = 0;
+        for( int x : a) {
+            sum = sum +x;
+        }
+        System.out.println(sum);
+    }
+
+    @Test
+    public void makeAnagram() {
+
+        String a = "cat";
+        String b = "abacats";
+
+        // Write your code here
+        int minNoOfDeletions = 0;
+
+        // a.substring(b) (in any order but same length and frequency ) must be non null
+
+        int[] a_frequencies = new int [26];
+        int[] b_frequencies = new int [26];
+
+        for (int i =0; i< a.length(); i++) {
+            char currenChar = a.charAt(i);
+            int charToInt = (int)currenChar;
+            int position = charToInt - (int)'a';
+            a_frequencies[position]++;
+        }
+
+        for (int i =0; i< b.length(); i++) {
+            char currenChar = b.charAt(i);
+            int charToInt = (int)currenChar;
+            int position = charToInt - (int)'a';
+            b_frequencies[position]++;
+        }
+
+        for (int i=0; i < 26; i++) {
+            int diff = Math.abs(a_frequencies[i] - b_frequencies[i] );
+            minNoOfDeletions += diff;
+        }
+
+        System.out.println(minNoOfDeletions);
+        //return minNoOfDeletions;
+
+    }
+
+
 
 }
