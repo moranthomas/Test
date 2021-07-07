@@ -142,6 +142,7 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -188,7 +189,21 @@
             <artifactId>actson</artifactId>
             <version>1.2.0</version>
         </dependency>
-
+        <dependency>
+            <artifactId>jcc</artifactId>
+            <groupId>com.ibm.db2</groupId>
+            <version>11.5.5.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>HikariCP</artifactId>
+            <groupId>com.zaxxer</groupId>
+            <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-jdbc</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>5.3.5</version>
+        </dependency>
     </dependencies>
 
 </project>

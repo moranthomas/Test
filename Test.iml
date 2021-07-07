@@ -128,5 +128,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:5.2.7.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.7.0" level="project" />
     <orderEntry type="library" name="Maven: de.undercouch:actson:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.ibm.db2:jcc:11.5.5.0" level="project" />
+    <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:4.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.3.5" level="project" />
   </component>
 </module>
