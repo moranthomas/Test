@@ -58,7 +58,12 @@ public class SimpleMonoAndFluxTests {
         return Flux.interval(period).take(10);
     }
 
-    /**********************************************************************************************/
+
+
+
+    /**
+     * Learn how to create Mono instances.
+     * **/
 
     //Return an empty Mono
     Mono<String> emptyMono() {
@@ -69,11 +74,10 @@ public class SimpleMonoAndFluxTests {
     @Test
     public void empty() {
         Mono<String> mono = this.emptyMono();
-        StepVerifier.create(mono)
-            .verifyComplete();
+        StepVerifier.create(mono).verifyComplete();
     }
 
-    // Return a Mono that never emits any signal
+    // Return a Mono that never emits any signal - why ??!
     Mono<String> monoWithNoSignal() {
         return Mono.never();
     }
@@ -96,6 +100,7 @@ public class SimpleMonoAndFluxTests {
     @Test
     public void fromValue() {
         Mono<String> mono = this.fooMono();
+        mono.log();
         StepVerifier.create(mono)
             .expectNext("foo")
             .verifyComplete();

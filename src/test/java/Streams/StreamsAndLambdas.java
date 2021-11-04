@@ -1,5 +1,6 @@
-package Lambdas;
+package Streams;
 
+import Lambdas.Person;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;

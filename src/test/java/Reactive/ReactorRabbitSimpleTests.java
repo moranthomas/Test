@@ -3,30 +3,21 @@ package Reactive;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.Pool;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Delivery;
-import io.vavr.control.Try;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.springframework.util.ResourceUtils;
@@ -61,13 +52,11 @@ public class ReactorRabbitSimpleTests {
     private final Receiver receiver = RabbitFlux.createReceiver();
     private final Sender sender = RabbitFlux.createSender();
 
-    SenderOptions senderOptions =  new SenderOptions()
+    /*SenderOptions senderOptions =  new SenderOptions()
         .connectionFactory(factory)
-        .connectionSupplier(cf -> cf.newConnection(
-            new Address[] {new Address("192.168.0.1"), new Address("192.168.0.2")},
-            "reactive-sender"))
+        .connectionSupplier(cf -> cf.newConnection(new Address[] {new Address("192.168.0.1"), new Address("192.168.0.2")}, "reactive-sender"))
         .resourceManagementScheduler(Schedulers.boundedElastic());
-
+*/
 
 
     @Test

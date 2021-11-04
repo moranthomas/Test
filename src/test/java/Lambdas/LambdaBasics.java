@@ -1,8 +1,13 @@
 package Lambdas;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +69,23 @@ public class LambdaBasics{
         log.info(String.valueOf(lengthLamba.getLength("Howlongami")));
     }
 
+
+    @Test
+    public void testIntegerListLambda() {
+        List<Integer> naturalNumbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+
+        List<Integer> doubles = naturalNumbers.stream()
+            .map(n -> {
+                Integer nr = n * 2;
+                return nr;
+            })
+            .collect(Collectors.toList());
+
+        log.info("doubles is: " + doubles.toString());
+    }
+
+    /**************** INTERFACE DEFINITIONS ********************/
+
     interface MyStringLambda {
         void logMeOut();
     }
@@ -75,5 +97,13 @@ public class LambdaBasics{
     interface StringLengthLambda {
         int getLength(String s);
     }
+
+    /** Examples of using the FUNCTIONAL class  *****/
+    // Adding an element to a given list.
+    BiConsumer<List, Integer> addIntoList = (List list, Integer element) -> list.add(element);
+
+    // Generate a unique number with the help of generator.
+    Supplier<Integer> uniqueKey = () -> new Random().nextInt();
+
 
 }
