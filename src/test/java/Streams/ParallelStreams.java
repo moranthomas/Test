@@ -1,4 +1,8 @@
 package Streams;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+import java.util.stream.IntStream;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -66,4 +70,71 @@ public class ParallelStreams {
             .collect(Collectors.toList());
         System.out.println(nums);
     }
+
+    @Test
+    public void simulateWorkloadToShowMultipleThreads() {
+        //The above tests will almost always just execute on main so we introduce some fake time wait to see the tasks exec
+        Stream.of(1, 2).parallel()
+            .peek(x -> System.out.println("processing "+x+" in "+Thread.currentThread()))
+            .map(x -> {
+                LockSupport.parkNanos("simulated workload", TimeUnit.SECONDS.toNanos(2));
+                return x;
+            })
+            .forEach(System.out::println);
+    }
+
+    /* Using reduce() */
+    @Test
+    public void sumNumbersInList() {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+        int result = numbers.stream().reduce(0, Integer::sum);
+        assertTrue(result == 21);
+    }
+
+    @Test
+    public void joinCharactersIntoString() {
+        List<String> letters = Arrays.asList("a", "b", "c", "d", "e");
+        String result = letters.stream().reduce("", String::concat);
+        assertTrue(result.equalsIgnoreCase("abcde"));
+    }
+
+    @Test
+    public void testParallelStreamNoFlatMap() {
+        List<List<String>> listOfLists = Arrays.asList(
+            Arrays.asList("one", "two"),
+            Arrays.asList("five", "six"),
+            Arrays.asList("three", "four")
+        );
+        listOfLists.parallelStream()
+            .forEach(System.out::println);
+    }
+
+    @Test
+    public void streamFlatMapExample() {
+        List<List<String>> listOfLists = Arrays.asList(
+            Arrays.asList("one", "two"),
+            Arrays.asList("five", "six"),
+            Arrays.asList("three", "four")
+        );
+
+        List<String> result = listOfLists.stream()
+            .flatMap(childList -> childList.stream())
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+
+    @Test
+    public void parallelStreamFlatMapExample() {
+        List<List<String>> listOfLists = Arrays.asList(
+            Arrays.asList("one", "two"),
+            Arrays.asList("five", "six"),
+            Arrays.asList("three", "four")
+        );
+        List<String> result = listOfLists
+            .parallelStream()
+            .flatMap(childList -> childList.stream())
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+
 }
