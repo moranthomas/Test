@@ -1,15 +1,14 @@
 package Strings;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.*;
-
-import org.junit.Test;
-import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.junit.Test;
 
-public class Strings {
+public class StringsTestFull {
 
     @Test
     public void testReversingAString() {
